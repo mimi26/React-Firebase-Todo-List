@@ -8,16 +8,37 @@ class App extends Component {
     this.state = { todos: {} };
 
     this.handleNewTodoInput = this.handleNewTodoInput.bind(this);
+    this.getTodos = this.getTodos.bind(this);
+    this.deleteTodo = this.deleteTodo.bind(this);
   }
 
   componentDidMount() {
-    axios.get('https://to-do-9f345.firebaseio.com/.json')
+    this.getTodos();
+  }
+
+  getTodos() {
+
+    axios.get(`https://to-do-9f345.firebaseio.com/todos.json`)
       .then((response) => {
         let todos = response.data;
-        //console.log(response.data.name);
+        console.log(todos);
         this.setState({ todos })
+        console.log(this.state);
       })
   }
+
+  // getTodos() {
+  //   axios({
+  //     url: '/todos.json',
+  //     baseURL: 'https://your-todo-url.firebaseio.com/',
+  //     method: "GET"
+  //   }).then((response) => {
+  //     this.setState({ todos: response.data });
+  //   }).catch((error) => {
+  //     console.log(error);
+  //   });
+  // }
+
 
   createTodo(todoText) {
     // your code goes here
@@ -31,6 +52,7 @@ class App extends Component {
     }).then((response) => {
       let todos = this.state.todos;
       let newTodoId = response.data.name;
+      console.log(newTodoId);
       todos[newTodoId] = newTodo;
       this.setState({ todos: todos });
     }).catch((error) => {
@@ -77,6 +99,12 @@ class App extends Component {
             <h4>{todo.title}</h4>
             <div>{moment(todo.createdAt).calendar()}</div>
           </div>
+          <button
+            className="ml-4 btn btn-link"
+            onClick={ () => { this.deleteTodo(todoId) } }
+            >
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       );
     }
@@ -88,12 +116,27 @@ class App extends Component {
     );
   }
 
+  deleteTodo(todoId) {
+
+    axios({
+      url: `/todos/${todoId}.json`,
+      baseURL: 'https://to-do-9f345.firebaseio.com/',
+      method: "DELETE",
+      }).then((response) => {
+      let todos = this.state.todos;
+      delete todos[todoId];
+        this.setState({ todos });
+    })
+  }
+
+
   render() {
     return (
       <div className="App container-fluid">
         <div className="row pt-3">
           <div className="col-6 px-4">
             {this.renderNewTodoBox()}
+            {this.renderTodoList()}
           </div>
         </div>
       </div>
