@@ -27,18 +27,6 @@ class App extends Component {
       })
   }
 
-  // getTodos() {
-  //   axios({
-  //     url: '/todos.json',
-  //     baseURL: 'https://your-todo-url.firebaseio.com/',
-  //     method: "GET"
-  //   }).then((response) => {
-  //     this.setState({ todos: response.data });
-  //   }).catch((error) => {
-  //     console.log(error);
-  //   });
-  // }
-
 
   createTodo(todoText) {
     // your code goes here
@@ -60,16 +48,6 @@ class App extends Component {
     });
   }
 
- // axios.post('https://to-do-9f345.firebaseio.com/.json', {
-    //   content: todoText,
-    //   title:,
-    //   createdAt: new Date()
-    //    })
-    //   .then((response) => {
-    //     this.setState({
-    //       todos: response.data
-    //     })
-    //   })
 
   handleNewTodoInput(event) {
     if (event.charCode === 13) {
@@ -95,7 +73,7 @@ class App extends Component {
 
       todoElements.push(
         <div className="todo d-flex justify-content-between pb-4" key={todoId}>
-          <div className="mt-2">
+          <div className="mt-2" onClick={ () => this.selectTodo(todoId) }>
             <h4>{todo.title}</h4>
             <div>{moment(todo.createdAt).calendar()}</div>
           </div>
@@ -122,12 +100,33 @@ class App extends Component {
       url: `/todos/${todoId}.json`,
       baseURL: 'https://to-do-9f345.firebaseio.com/',
       method: "DELETE",
-      }).then((response) => {
+    }).then((response) => {
       let todos = this.state.todos;
       delete todos[todoId];
-        this.setState({ todos });
+      this.setState({ todos });
     })
   }
+
+
+  selectTodo(todoId) {
+    this.setState({ currentTodo: todoId });
+  }
+
+  renderSelectedTodo() {
+    let content;
+
+    if (this.state.currentTodo) {
+      let currentTodo = this.state.todos[this.state.currentTodo];
+      content =  (
+        <div>
+          <h1>{currentTodo.title}</h1>
+        </div>
+      );
+    }
+
+    return content;
+  }
+
 
 
   render() {
@@ -137,6 +136,9 @@ class App extends Component {
           <div className="col-6 px-4">
             {this.renderNewTodoBox()}
             {this.renderTodoList()}
+          </div>
+          <div className="col-6 px-4">
+            {this.renderSelectedTodo()}
           </div>
         </div>
       </div>
